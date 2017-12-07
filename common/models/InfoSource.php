@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "info_source".
@@ -43,6 +45,13 @@ class InfoSource extends \yii\db\ActiveRecord
         ];
     }
 
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::className(),
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -75,5 +84,61 @@ class InfoSource extends \yii\db\ActiveRecord
     public function getPosts()
     {
         return $this->hasMany(Post::className(), ['info_source_id' => 'id']);
+    }
+
+    /**
+     * @param $urls
+     * @return array
+     */
+    public static function addTelegramChannel($urls)
+    {
+        $models = [];
+        foreach ($urls as $url){
+            if (($model = InfoSource::findAll(['url' => $url])) !== null){
+                $model = new InfoSource();
+                $model->title = $url;
+                $model->url = $url;
+                $model->subscribers_quantity = 0;
+                $model->info_source_type_id = 1;
+                $model->indexing_priority = 1;
+                $model->last_indexed_date_time = null;
+                if ($model->save()){
+                    array_push($models, $model);
+                    // TODO ​ добавить​ ​ в ​ ​ очередь​ ​ задание​ ​ на​ ​ индексацию​ ​ данного канала.
+                    /*
+                      add_task
+                             {
+                                task_type:​ ​ "index_telegram_channel";
+                                task_data:​ ​ {
+                                info_source_id:​ ​ "1";
+                                 }
+                                 }
+                    */
+                }else{
+                    array_push($models ,$model->save());
+                }
+            }
+        }
+        return $models;
+    }
+
+    /**
+     * @param $post
+     * @return null|NotFoundHttpException|static
+     */
+    public static function updateTelegramChannel($post)
+    {
+        if (($model = InfoSource::findOne($post['info_source_id'])) !== null) {
+            $model->title = $post['title'];
+            $model->url = $post['url'];
+            $model->subscribers_quantity = $post['subscribers_quantity'];
+            if ($model->save()) {
+                return $model;
+            }else{
+                return $model->id.' failed';
+            }
+        } else {
+            return new NotFoundHttpException('info source not found');
+        }
     }
 }

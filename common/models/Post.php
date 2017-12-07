@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Exception;
 
 /**
  * This is the model class for table "post".
@@ -45,6 +47,13 @@ class Post extends \yii\db\ActiveRecord
         ];
     }
 
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::className(),
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -79,5 +88,31 @@ class Post extends \yii\db\ActiveRecord
     public function getInfoSource()
     {
         return $this->hasOne(InfoSource::className(), ['id' => 'info_source_id']);
+    }
+
+    public static function addPost($post)
+    {
+        $model = new Post();
+        $model->info_source_id = $post['info_source_id'];
+        $model->post_url = $post['post_url'];
+        $model->post_data = $post['post_data'];
+        $model->post_views = $post['post_views'];
+        $model->published_datetime = Yii::$app->formatter->asTimestamp($post['published_datetime'], 'dd.mm.yyyy H:i');
+        if ($model->save()){
+            $model->infoSource->last_indexed_date_time = $model->published_datetime;
+            // TODO Также,​ ​ метод​ ​ добавляет​ ​ в ​ ​ очередь​ ​ задание​ ​ на​ ​ поиск​ ​ упоминаний​ ​ вданном​ ​ посте.
+            /*
+                 add_task
+                        {
+                            task_type:​ ​ "search_post_for_mentions";
+                            task_data:​ ​ {
+                                        post_id:​ ​ "1";
+                                     }
+                         }
+             */
+            return $model;
+        }else{
+            throw new Exception('the post with info_source_id = '. $model->info_source_id .' not added');
+        }
     }
 }

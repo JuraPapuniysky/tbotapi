@@ -13,7 +13,9 @@ return [
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
-            'csrfParam' => '_csrf-frontend',
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -36,14 +38,23 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api' => 'api'],
+                    'extraPatterns' => [
+                        'POST add_telegram_channels' => 'add-telegram-channels',
+                        'POST update_info_source' => 'update-info-source',
+                        'POST add_post' => 'add-post',
+                    ],
+                ],
             ],
-        ],
-        */
+        ]
+
     ],
     'params' => $params,
 ];
