@@ -50,6 +50,8 @@ return [
                         'POST add_telegram_channels' => 'add-telegram-channels',
                         'POST update_info_source' => 'update-info-source',
                         'POST add_post' => 'add-post',
+                        'POST update_posts_views' => 'update-posts-views',
+                        'POST test' => 'test',
                     ],
                 ],
             ],

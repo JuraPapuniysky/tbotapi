@@ -87,14 +87,15 @@ class InfoSource extends \yii\db\ActiveRecord
     }
 
     /**
-     * @param $urls
+     * @param $data
      * @return array
      */
-    public static function addTelegramChannel($urls)
+    public static function addTelegramChannel($data)
     {
+        $urls = explode(',', str_replace(' ', '', $data->urls));
         $models = [];
         foreach ($urls as $url){
-            if (($model = InfoSource::findAll(['url' => $url])) !== null){
+            if (($model = InfoSource::findOne(['url' => $url])) === null){
                 $model = new InfoSource();
                 $model->title = $url;
                 $model->url = $url;
@@ -123,19 +124,19 @@ class InfoSource extends \yii\db\ActiveRecord
     }
 
     /**
-     * @param $post
-     * @return null|NotFoundHttpException|static
+     * @param $data
+     * @return null|string|NotFoundHttpException|static
      */
-    public static function updateTelegramChannel($post)
+    public static function updateTelegramChannel($data)
     {
-        if (($model = InfoSource::findOne($post['info_source_id'])) !== null) {
-            $model->title = $post['title'];
-            $model->url = $post['url'];
-            $model->subscribers_quantity = $post['subscribers_quantity'];
+        if (($model = InfoSource::findOne($data->info_source_id)) !== null) {
+            $model->title = $data->title;
+            $model->url = $data->url;
+            $model->subscribers_quantity = $data->subscribers_quantity;
             if ($model->save()) {
                 return $model;
             }else{
-                return $model->id.' failed';
+                return "$model->id failed";
             }
         } else {
             return new NotFoundHttpException('info source not found');

@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "post".
@@ -90,16 +91,17 @@ class Post extends \yii\db\ActiveRecord
         return $this->hasOne(InfoSource::className(), ['id' => 'info_source_id']);
     }
 
-    public static function addPost($post)
+    public static function addPost($data)
     {
         $model = new Post();
-        $model->info_source_id = $post['info_source_id'];
-        $model->post_url = $post['post_url'];
-        $model->post_data = $post['post_data'];
-        $model->post_views = $post['post_views'];
-        $model->published_datetime = Yii::$app->formatter->asTimestamp($post['published_datetime'], 'dd.mm.yyyy H:i');
+        $model->info_source_id = $data->info_source_id;
+        $model->post_url = $data->post_url;
+        $model->post_data = $data->post_data;
+        $model->post_views = $data->post_views;
+        $model->published_datetime = Yii::$app->formatter->asTimestamp($data->published_datetime, 'dd.mm.yyyy H:i');
+        $model->infoSource->last_indexed_date_time = $model->published_datetime;
         if ($model->save()){
-            $model->infoSource->last_indexed_date_time = $model->published_datetime;
+
             // TODO Также,​ ​ метод​ ​ добавляет​ ​ в ​ ​ очередь​ ​ задание​ ​ на​ ​ поиск​ ​ упоминаний​ ​ вданном​ ​ посте.
             /*
                  add_task
@@ -114,5 +116,23 @@ class Post extends \yii\db\ActiveRecord
         }else{
             throw new Exception('the post with info_source_id = '. $model->info_source_id .' not added');
         }
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public static function updatePostsViews($data)
+    {
+        $models = [];
+        foreach ($data->posts as $post){
+            if (($model = Post::findOne($post->id)) !== null){
+                $model->post_views = $post->views;
+                if($model->save()){
+                    array_push($models, $model);
+                }
+            }
+        }
+        return $models;
     }
 }

@@ -10,6 +10,7 @@ use yii\rest\ActiveController;
 
 class ApiController extends ActiveController
 {
+
     public $modelClass = 'common\models\InfoSources';
 
     /**
@@ -17,20 +18,45 @@ class ApiController extends ActiveController
      */
     public function actionAddTelegramChannels()
     {
-        $urls = explode(', ', \Yii::$app->request->post('urls'));
-        $modelsAdded = InfoSource::addTelegramChannel($urls);
+        $modelsAdded = InfoSource::addTelegramChannel(self::jsonDecoder());
         return $modelsAdded;
     }
 
 
+    /**
+     * @return null|\yii\web\NotFoundHttpException|static
+     */
     public function actionUpdateInfoSource()
     {
-       return InfoSource::updateTelegramChannel(\Yii::$app->request->post());
+       return InfoSource::updateTelegramChannel(self::jsonDecoder());
     }
+
 
     public function actionAddPost()
     {
-        $post = \Yii::$app->request->post();
-        Post::addPost($post);
+        return Post::addPost(self::jsonDecoder());
+    }
+
+    public function actionUpdatePostsViews()
+    {
+        return Post::updatePostsViews(self::jsonDecoder());
+    }
+
+    public function actionTest()
+    {
+
+        $a = self::jsonDecoder();
+        return $a;
+       // return Post::find()->all();
+    }
+
+
+
+    /**
+     * @return mixed
+     */
+    protected static function jsonDecoder()
+    {
+        return json_decode(file_get_contents("php://input"));
     }
 }
