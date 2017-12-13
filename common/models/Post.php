@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
-use yii\web\NotFoundHttpException;
+
 
 /**
  * This is the model class for table "post".
@@ -91,6 +91,11 @@ class Post extends \yii\db\ActiveRecord
         return $this->hasOne(InfoSource::className(), ['id' => 'info_source_id']);
     }
 
+    /**
+     * @param $data
+     * @return Post
+     * @throws Exception
+     */
     public static function addPost($data)
     {
         $model = new Post();
@@ -101,17 +106,8 @@ class Post extends \yii\db\ActiveRecord
         $model->published_datetime = Yii::$app->formatter->asTimestamp($data->published_datetime, 'dd.mm.yyyy H:i');
         $model->infoSource->last_indexed_date_time = $model->published_datetime;
         if ($model->save()){
-
-            // TODO Также,​ ​ метод​ ​ добавляет​ ​ в ​ ​ очередь​ ​ задание​ ​ на​ ​ поиск​ ​ упоминаний​ ​ вданном​ ​ посте.
-            /*
-                 add_task
-                        {
-                            task_type:​ ​ "search_post_for_mentions";
-                            task_data:​ ​ {
-                                        post_id:​ ​ "1";
-                                     }
-                         }
-             */
+            $rabbitMQ = new RabbitMQ();
+            $rabbitMQ->searchPostForMentions($model->id);
             return $model;
         }else{
             throw new Exception('the post with info_source_id = '. $model->info_source_id .' not added');

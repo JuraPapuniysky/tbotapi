@@ -94,6 +94,7 @@ class InfoSource extends \yii\db\ActiveRecord
     {
         $urls = explode(',', str_replace(' ', '', $data->urls));
         $models = [];
+        $radits = [];
         foreach ($urls as $url){
             if (($model = InfoSource::findOne(['url' => $url])) === null){
                 $model = new InfoSource();
@@ -105,16 +106,8 @@ class InfoSource extends \yii\db\ActiveRecord
                 $model->last_indexed_date_time = null;
                 if ($model->save()){
                     array_push($models, $model);
-                    // TODO ​ добавить​ ​ в ​ ​ очередь​ ​ задание​ ​ на​ ​ индексацию​ ​ данного канала.
-                    /*
-                      add_task
-                             {
-                                task_type:​ ​ "index_telegram_channel";
-                                task_data:​ ​ {
-                                info_source_id:​ ​ "1";
-                                 }
-                                 }
-                    */
+                    $rabbitMQ = new RabbitMQ();
+                    $rabbitMQ->indexTelegramChannel($model->id);
                 }else{
                     array_push($models ,$model->save());
                 }
