@@ -6,6 +6,7 @@ namespace frontend\controllers;
 
 use common\models\InfoSource;
 use common\models\Post;
+use common\models\Scrapper;
 use yii\rest\ActiveController;
 
 class ApiController extends ActiveController
@@ -37,20 +38,30 @@ class ApiController extends ActiveController
         return Post::addPost(self::jsonDecoder());
     }
 
+    /**
+     * @return array
+     */
     public function actionUpdatePostsViews()
     {
         return Post::updatePostsViews(self::jsonDecoder());
     }
 
-    public function actionTest()
+    /**
+     * Generates a code for authenticate on the server
+     * @return string
+     */
+    public function actionInitScrapper()
     {
-
-        $a = self::jsonDecoder();
-        return $a;
-       // return Post::find()->all();
+        $data = self::jsonDecoder();
+        if (($scrapper = Scrapper::findOne(['uuid4' => $data->id])) !== null){
+            $scrapper->generateAccessHash();
+            if($scrapper->save()){
+                return $scrapper->access_hash;
+            }
+        } else{
+            return 'Error Scrapper with uuid4'.$data->id.'not found.';
+        }
     }
-
-
 
     /**
      * @return mixed
@@ -58,5 +69,14 @@ class ApiController extends ActiveController
     protected static function jsonDecoder()
     {
         return json_decode(file_get_contents("php://input"));
+    }
+
+
+    public function actionTest()
+    {
+
+        $a = self::jsonDecoder();
+        return $a;
+        // return Post::find()->all();
     }
 }

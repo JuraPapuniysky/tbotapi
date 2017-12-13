@@ -38,6 +38,9 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'uuid' => [
+            'class' => 'ollieday\uuid\Uuid',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,

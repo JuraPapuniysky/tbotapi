@@ -20,7 +20,8 @@
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "telegram-bot/api": "^2.3",
         "airani/yii2-telegram-log": "^1.0",
-        "php-amqplib/php-amqplib": ">=2.6.1"
+        "php-amqplib/php-amqplib": ">=2.6.1",
+        "ollieday/yii2-uuid": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
