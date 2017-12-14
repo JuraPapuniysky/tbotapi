@@ -13,6 +13,9 @@ use yii\behaviors\TimestampBehavior;
  * @property string $access_hash
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $api_id
+ * @property string $api_hash
+ * @property string $access_code
  */
 class Scrapper extends \yii\db\ActiveRecord
 {
@@ -30,8 +33,9 @@ class Scrapper extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['created_at', 'updated_at'], 'integer'],
-            [['uuid4', 'access_hash'], 'string', 'max' => 128],
+            [['created_at', 'updated_at', 'api_id',], 'integer'],
+            [['uuid4', 'access_hash', 'api_hash',], 'string', 'max' => 128],
+            [['access_code'], 'string', 'max' => 32],
         ];
     }
 
@@ -56,13 +60,38 @@ class Scrapper extends \yii\db\ActiveRecord
         ];
     }
 
-    public function generateAccessHash()
+    public function generateAccessCode()
     {
-        $this->access_hash = Yii::$app->uuid->uuid4();
+        $this->access_code = Yii::$app->security->generateRandomString();
     }
 
-    public function removeAccessHash()
+    public function removeAccessCode()
     {
-        $this->access_hash = null;
+        $this->access_code = null;
     }
+
+    public function activateScrapper()
+    {
+        return ["api_id" => $this->api_id, "api_hash" => $this->api_hash];
+    }
+
+
+    /**
+     * @param $uuid4
+     * @param $access_hash
+     * @return bool|null|static
+     */
+    public static function isScrapper($uuid4, $access_hash)
+    {
+        if (($model = Scrapper::findOne(['uuid4' => $uuid4])) !== null){
+            if ($model->access_hash === $access_hash){
+                return $model;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
 }
