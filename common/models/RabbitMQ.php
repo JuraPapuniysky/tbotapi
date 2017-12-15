@@ -15,9 +15,8 @@ class RabbitMQ
 
     public function __construct()
     {
-        $this->connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+        $this->connection = new AMQPStreamConnection('185.16.42.168', 5672, 'tbot', 'ASDFwEWEW');
         $this->channel = $this->connection->channel();
-        $this->channel->queue_declare('tbot_queue');
     }
 
     /**
@@ -28,7 +27,7 @@ class RabbitMQ
     {
         $taskType  = "index_telegram_channel";
         $data = ['task_type' => $taskType, 'task_data' => ['info_source_id' => $infoSourceId]];
-        $this->sender($taskType, $data);
+        $this->sender($data, 'tbot_notification');
         return $data;
     }
 
@@ -41,18 +40,19 @@ class RabbitMQ
     {
         $taskType  = "search_post_for_mentions";
         $data = $data = ['task_type' => $taskType, 'task_data' => ['post_id' => $postId]];
-        $this->sender($taskType, $data);
+        $this->sender($data, 'tbot_message_analyze');
         return $data;
     }
 
     /**
-     * @param $taskType
      * @param $data
+     * @param $channelName
      */
-    private function sender($taskType, $data)
+    private function sender($data, $channelName)
     {
+        $this->channel->queue_declare($channelName);
         $msg = new AMQPMessage(json_encode($data));
-        $this->channel->basic_publish($msg, '', 'tbot_queue');
+        $this->channel->basic_publish($msg, '', $channelName);
         $this->channel->close();
         $this->connection->close();
     }
