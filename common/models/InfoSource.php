@@ -19,7 +19,6 @@ use yii\web\NotFoundHttpException;
  * @property integer $created_at
  * @property integer $updated_at
  *
- * @property InfoSourceType $infoSourceType
  * @property Post[] $posts
  */
 class InfoSource extends \yii\db\ActiveRecord
@@ -39,9 +38,8 @@ class InfoSource extends \yii\db\ActiveRecord
     {
         return [
             [['url'], 'string'],
-            [['subscribers_quantity', 'info_source_type_id', 'indexing_priority', 'last_indexed_date_time', 'created_at', 'updated_at'], 'integer'],
+            [['subscribers_quantity', 'indexing_priority', 'last_indexed_date_time', 'created_at', 'updated_at'], 'integer'],
             [['title'], 'string', 'max' => 255],
-            [['info_source_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => InfoSourceType::className(), 'targetAttribute' => ['info_source_type_id' => 'id']],
         ];
     }
 
@@ -70,13 +68,6 @@ class InfoSource extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getInfoSourceType()
-    {
-        return $this->hasOne(InfoSourceType::className(), ['id' => 'info_source_type_id']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -101,7 +92,7 @@ class InfoSource extends \yii\db\ActiveRecord
                 $model->title = $url;
                 $model->url = $url;
                 $model->subscribers_quantity = 0;
-                $model->info_source_type_id = 1;
+
                 $model->indexing_priority = 1;
                 $model->last_indexed_date_time = null;
                 if ($model->save()){

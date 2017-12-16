@@ -49,9 +49,9 @@ class ApiController extends ActiveController
     public function actionUpdatePostsViews()
     {
         $data = self::jsonDecoder();
-        if (Scrapper::isScrapper($data->id, $data->access_hash) !== false) {
+       // if (Scrapper::isScrapper($data->id, $data->access_hash) !== false) {
             return Post::updatePostsViews($data);
-        }
+      //  }
     }
 
     /**
@@ -107,16 +107,17 @@ class ApiController extends ActiveController
     public function actionGetAccounts()
     {
         $data = self::jsonDecoder();
-        if (Scrapper::isScrapper($data->id, $data->access_hash)){
-            /**
-             * TODO getAccounts for scrappers.
-             * Получаем список пользователей с параметрами. Вносим в базу
-             * Возвращаем всех активних пользователей обработчика.
-             * Надо определить могут ли сборщики пользоваться одинаковыми пользователями.
-             */
+        if (($scrapper = Scrapper::isScrapper($data->id, $data->access_hash)) !== false){
+            return ['id' => $data->id, 'accounts' => $scrapper->updateAccounts($data->accounts), "cleanup" => true];
         }else{
             return new Error(0, 'Scrapper not found');
         }
+    }
+
+
+    public function getTask()
+    {
+
     }
 
     /**
@@ -134,5 +135,10 @@ class ApiController extends ActiveController
         $a = self::jsonDecoder();
         return $a;
         // return Post::find()->all();
+    }
+
+    public function actionGetTask()
+    {
+
     }
 }

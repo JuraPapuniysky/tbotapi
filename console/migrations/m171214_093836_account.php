@@ -12,7 +12,17 @@ class m171214_093836_account extends Migration
      */
     public function safeUp()
     {
+        $this->createTable('{{%account}}', [
+            'id' => $this->primaryKey(),
+            'scrapper_id'=> $this->integer(),
+            'phoneNumber' => $this->string(32),
+            'is_active' => $this->boolean(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
+        ]);
+        $this->createIndex('FK_SCRAPPER_ACCOUNT', '{{%account}}', 'scrapper_id');
 
+        $this->addForeignKey('FK_SCRAPPER_ACCOUNT', '{{%account}}', 'scrapper_id', '{{%scrapper}}', 'id');
     }
 
     /**

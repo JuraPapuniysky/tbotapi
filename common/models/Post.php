@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\web\NotFoundHttpException;
 
 
 /**
@@ -96,21 +97,32 @@ class Post extends \yii\db\ActiveRecord
      * @return Post
      * @throws Exception
      */
-    public static function addPost($data)
+    public static function addPost($request)
     {
-        $model = new Post();
-        $model->info_source_id = $data->info_source_id;
-        $model->post_url = $data->post_url;
-        $model->post_data = $data->post_data;
-        $model->post_views = $data->post_views;
-        $model->published_datetime = Yii::$app->formatter->asTimestamp($data->published_datetime, 'dd.mm.yyyy H:i');
-        $model->infoSource->last_indexed_date_time = $model->published_datetime;
-        if ($model->save()){
-            $rabbitMQ = new RabbitMQ();
-            $rabbitMQ->searchPostForMentions($model->id);
-            return $model;
+        foreach ($request->messages as $data) {
+            $model = new Post();
+            $model->info_source_id = self::getInfoSourceId($data->to_id->channel_id);
+            $model->post_url = $data->post_url;
+            $model->post_data = $data->message;
+            //$model->post_views = $data->views;
+            $model->published_datetime = $data->date;
+            $model->infoSource->last_indexed_date_time = $data->date;
+            if ($model->save()) {
+                $rabbitMQ = new RabbitMQ();
+                $rabbitMQ->searchPostForMentions($model->id);
+                return $model;
+            } else {
+                return null; //throw new Exception('the post with info_source_id = ' . $model->info_source_id . ' not added');
+            }
+        }
+    }
+
+    public static function getInfoSourceId($channel_id)
+    {
+        if (($model = InfoSource::findOne(['info_source_id' => $channel_id])) !== null){
+            return $model->id;
         }else{
-            throw new Exception('the post with info_source_id = '. $model->info_source_id .' not added');
+            throw new NotFoundHttpException('info_source_not found with id ' . $channel_id);
         }
     }
 

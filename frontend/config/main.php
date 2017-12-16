@@ -52,9 +52,15 @@ return [
                     'extraPatterns' => [
                         'POST add_telegram_channels' => 'add-telegram-channels',
                         'POST updateChannels' => 'update-channels',
-                        'POST add_post' => 'add-post',
+                        'POST newMessage' => 'add-post',
                         'POST update_posts_views' => 'update-posts-views',
                         'POST test' => 'test',
+                        'POST initScrapper' => 'init-scrapper',
+                        'POST activateScrapper' => 'activate-scrapper',
+                        'POST deactivateScrapper' => 'deactivate-scrapper',
+                        'POST getAccounts' => 'get-accounts',
+
+
                     ],
                 ],
             ],
