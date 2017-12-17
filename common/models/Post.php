@@ -22,6 +22,7 @@ use yii\web\NotFoundHttpException;
  * @property string $author
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $chat_message_id
  *
  * @property Mention[] $mentions
  * @property InfoSource $infoSource
@@ -42,7 +43,7 @@ class Post extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['info_source_id', 'post_views', 'post_repost_count', 'post_repost_views', 'published_datetime', 'created_at', 'updated_at'], 'integer'],
+            [['info_source_id', 'chat_message_id', 'post_views', 'post_repost_count', 'post_repost_views', 'published_datetime', 'created_at', 'updated_at'], 'integer'],
             [['post_data'], 'string'],
             [['post_url', 'author'], 'string', 'max' => 255],
             [['info_source_id'], 'exist', 'skipOnError' => true, 'targetClass' => InfoSource::className(), 'targetAttribute' => ['info_source_id' => 'id']],
@@ -93,9 +94,8 @@ class Post extends \yii\db\ActiveRecord
     }
 
     /**
-     * @param $data
-     * @return Post
-     * @throws Exception
+     * @param $request
+     * @return Post|null
      */
     public static function addPost($request)
     {
@@ -104,15 +104,31 @@ class Post extends \yii\db\ActiveRecord
             $model->info_source_id = self::getInfoSourceId($data->to_id->channel_id);
             $model->post_url = $data->post_url;
             $model->post_data = $data->message;
-            //$model->post_views = $data->views;
+            $model->post_views = $data->views;
             $model->published_datetime = $data->date;
             $model->infoSource->last_indexed_date_time = $data->date;
+            $model->chat_message_id = $data->id;
             if ($model->save()) {
                 $rabbitMQ = new RabbitMQ();
                 $rabbitMQ->searchPostForMentions($model->id);
-                return $model;
-            } else {
-                return null; //throw new Exception('the post with info_source_id = ' . $model->info_source_id . ' not added');
+            }
+        }
+    }
+
+    public static function updatePosts($posts)
+    {
+        foreach ($posts as $post){
+            $dbPosts = Post::findAll(['chat_message_id' => $post->id]);
+            foreach ($dbPosts as $dbPost){
+                if ($dbPost->infoSource->info_source_id == $post->to_id->channel_id){
+                    $dbPost->post_data = $post->message;
+                    $dbPost->post_views = $post->views;
+                    $dbPost->published_datetime = $post->date;
+                    $dbPost->infoSource->last_indexed_date_time = $post->date;
+                    $dbPost->chat_message_id = $post->id;
+                    $dbPost->save();
+                    $dbPost->infoSource;
+                }
             }
         }
     }
@@ -143,4 +159,6 @@ class Post extends \yii\db\ActiveRecord
         }
         return $models;
     }
+
+
 }

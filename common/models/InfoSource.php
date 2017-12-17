@@ -18,6 +18,8 @@ use yii\web\NotFoundHttpException;
  * @property integer $last_indexed_date_time
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $info_source_id
+ * @property static $access_hash
  *
  * @property Post[] $posts
  */
@@ -37,8 +39,8 @@ class InfoSource extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['url'], 'string'],
-            [['subscribers_quantity', 'indexing_priority', 'last_indexed_date_time', 'created_at', 'updated_at'], 'integer'],
+            [['url', 'access_hash'], 'string'],
+            [['info_source_id', 'subscribers_quantity', 'indexing_priority', 'last_indexed_date_time', 'created_at', 'updated_at'], 'integer'],
             [['title'], 'string', 'max' => 255],
         ];
     }

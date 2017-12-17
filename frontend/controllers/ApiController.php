@@ -40,7 +40,18 @@ class ApiController extends ActiveController
 
     public function actionAddPost()
     {
-        return Post::addPost(self::jsonDecoder());
+        $data = self::jsonDecoder();
+        if (Scrapper::isScrapper($data->id, $data->access_hash) !== false) {
+            return Post::addPost(self::jsonDecoder());
+        }
+    }
+
+    public function actionUpdatePosts()
+    {
+        $data = self::jsonDecoder();
+        if (Scrapper::isScrapper($data->id, $data->access_hash) !== false){
+            return Post::updatePosts($data->messages);
+        }
     }
 
     /**
