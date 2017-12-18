@@ -36,10 +36,10 @@ class RabbitMQ
      * @param $postId
      * @return array
      */
-    public function searchPostForMentions($postId)
+    public function searchPostForMentions($post)
     {
         $taskType  = "search_post_for_mentions";
-        $data = $data = ['task_type' => $taskType, 'task_data' => ['post_id' => $postId]];
+        $data = $data = ['task_type' => $taskType, 'task_data' => ['post' => $post]];
         $this->sender($data, 'tbot_message_analyze');
         return $data;
     }

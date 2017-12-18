@@ -108,19 +108,19 @@ class Post extends \yii\db\ActiveRecord
             $model->published_datetime = $data->date;
             $model->infoSource->last_indexed_date_time = $data->date;
             $model->chat_message_id = $data->id;
-            if ($model->save()) {
-                $rabbitMQ = new RabbitMQ();
-                $rabbitMQ->searchPostForMentions($model->id);
-            }
+
+            $rabbitMQ = new RabbitMQ();
+            $rabbitMQ->searchPostForMentions($model);
+
         }
     }
 
     public static function updatePosts($posts)
     {
-        foreach ($posts as $post){
+        foreach ($posts as $post) {
             $dbPosts = Post::findAll(['chat_message_id' => $post->id]);
-            foreach ($dbPosts as $dbPost){
-                if ($dbPost->infoSource->info_source_id == $post->to_id->channel_id){
+            foreach ($dbPosts as $dbPost) {
+                if ($dbPost->infoSource->info_source_id == $post->to_id->channel_id) {
                     $dbPost->post_data = $post->message;
                     $dbPost->post_views = $post->views;
                     $dbPost->published_datetime = $post->date;
@@ -135,9 +135,9 @@ class Post extends \yii\db\ActiveRecord
 
     public static function getInfoSourceId($channel_id)
     {
-        if (($model = InfoSource::findOne(['info_source_id' => $channel_id])) !== null){
+        if (($model = InfoSource::findOne(['info_source_id' => $channel_id])) !== null) {
             return $model->id;
-        }else{
+        } else {
             throw new NotFoundHttpException('info_source_not found with id ' . $channel_id);
         }
     }
@@ -149,10 +149,10 @@ class Post extends \yii\db\ActiveRecord
     public static function updatePostsViews($data)
     {
         $models = [];
-        foreach ($data->posts as $post){
-            if (($model = Post::findOne($post->id)) !== null){
+        foreach ($data->posts as $post) {
+            if (($model = Post::findOne($post->id)) !== null) {
                 $model->post_views = $post->views;
-                if($model->save()){
+                if ($model->save()) {
                     array_push($models, $model);
                 }
             }
