@@ -89,6 +89,6 @@ class HelloController extends Controller
     public function actionTest()
     {
         $worker = new TestWorker();
-        print_r($worker->work());
+        $worker->work();
     }
 }

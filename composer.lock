@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b66a0b272c933942c58d764c91065c9",
+    "content-hash": "b5e37992b700fe5f3c8d590a66c3f0c8",
     "packages": [
         {
             "name": "airani/yii2-telegram-log",
