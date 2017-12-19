@@ -107,10 +107,8 @@ class Post extends \yii\db\ActiveRecord
             $model->published_datetime = $data->date;
             $model->infoSource->last_indexed_date_time = $data->date;
             $model->chat_message_id = $data->id;
-            if ($model->save()) {
-                $rabbitMQ = new RabbitMQ();
-                $rabbitMQ->searchPostForMentions($model);
-            }
+            $rabbitMQ = new RabbitMQ();
+            $rabbitMQ->searchPostForMentions($model);
         }
     }
 

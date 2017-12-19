@@ -5,6 +5,7 @@ namespace common\models;
 
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
+use yii\base\ErrorException;
 
 /**
  * Class Worker
@@ -67,6 +68,15 @@ class Worker
                 }
             }
             $this->updateTime = time();
+        }
+    }
+
+    public function sendTask()
+    {
+        try {
+            return ($this->channel->basic_get('tbot_update_content', true, null)->body);
+        }catch (ErrorException $e){
+            return null;
         }
     }
 }

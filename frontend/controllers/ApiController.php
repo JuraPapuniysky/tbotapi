@@ -18,6 +18,7 @@ class ApiController extends ActiveController
     public $modelClass = 'common\models\InfoSources';
 
     /**
+     * Adds telegram info source to db. (channels, chats, ...)
      * @return array
      */
     public function actionAddTelegramChannels()
@@ -28,6 +29,7 @@ class ApiController extends ActiveController
 
 
     /**
+     * Updates data id saved telegram info source.
      * @return null|\yii\web\NotFoundHttpException|static
      */
     public function actionUpdateChannels()
@@ -39,6 +41,10 @@ class ApiController extends ActiveController
     }
 
 
+    /**
+     * Add posts to db
+     * @return Post|null
+     */
     public function actionAddPost()
     {
         $data = self::jsonDecoder();
@@ -116,6 +122,9 @@ class ApiController extends ActiveController
         }
     }
 
+    /**
+     * @return array|Error
+     */
     public function actionGetAccounts()
     {
         $data = self::jsonDecoder();
@@ -126,17 +135,13 @@ class ApiController extends ActiveController
         }
     }
 
-
+    /**
+     * @return null
+     */
     public function actionGetTask()
     {
         $worker = new Worker();
-        $worker->channel->queue_declare('tbot_update_content');
-        $callback = function($msg) {
-            return $msg->body;
-        };
-        $worker->channel->basic_consume('tbot_upodate_content', '', false, true, false, false, $callback);
-
-        $worker->channel->wait();
+        return $worker->sendTask();
     }
 
     /**
