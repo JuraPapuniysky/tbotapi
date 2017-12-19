@@ -100,7 +100,7 @@ class InfoSource extends \yii\db\ActiveRecord
                 if ($model->save()){
                     array_push($models, $model);
                     $rabbitMQ = new RabbitMQ();
-                    $rabbitMQ->indexTelegramChannel($model->id);
+                    $rabbitMQ->indexTelegramChannel($model);
                 }else{
                     array_push($models ,$model->save());
                 }

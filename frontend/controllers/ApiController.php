@@ -8,6 +8,7 @@ use common\models\Error;
 use common\models\InfoSource;
 use common\models\Post;
 use common\models\Scrapper;
+use common\models\Worker;
 use yii\rest\ActiveController;
 
 
@@ -126,9 +127,16 @@ class ApiController extends ActiveController
     }
 
 
-    public function getTask()
+    public function actionGetTask()
     {
+        $worker = new Worker();
+        $worker->channel->queue_declare('tbot_update_content');
+        $callback = function($msg) {
+            return $msg->body;
+        };
+        $worker->channel->basic_consume('tbot_upodate_content', '', false, true, false, false, $callback);
 
+        $worker->channel->wait();
     }
 
     /**
@@ -137,19 +145,5 @@ class ApiController extends ActiveController
     protected static function jsonDecoder()
     {
         return json_decode(file_get_contents("php://input"));
-    }
-
-
-    public function actionTest()
-    {
-
-        $a = self::jsonDecoder();
-        return $a;
-        // return Post::find()->all();
-    }
-
-    public function actionGetTask()
-    {
-
     }
 }

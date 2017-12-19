@@ -78,4 +78,13 @@ class Mention extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Repost::className(), ['mention_id' => 'id']);
     }
+
+    public static function createNewMention($subscriptionId, $postId)
+    {
+        $model = new Mention();
+        $model->post_id = $postId;
+        $model->subscription_id = $subscriptionId;
+        $model->is_notified = 1;
+        return $model->save;
+    }
 }

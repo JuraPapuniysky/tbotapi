@@ -4,7 +4,6 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\Exception;
 use yii\web\NotFoundHttpException;
 
 
@@ -110,11 +109,14 @@ class Post extends \yii\db\ActiveRecord
             $model->chat_message_id = $data->id;
             if ($model->save()) {
                 $rabbitMQ = new RabbitMQ();
-                $rabbitMQ->searchPostForMentions($model->id);
+                $rabbitMQ->searchPostForMentions($model);
             }
         }
     }
 
+    /**
+     * @param $posts
+     */
     public static function updatePosts($posts)
     {
         foreach ($posts as $post){
@@ -158,6 +160,23 @@ class Post extends \yii\db\ActiveRecord
             }
         }
         return $models;
+    }
+
+    public static function savePost($data)
+    {
+        $model = new Post();
+        $model->info_source_id = $data->to_id->channel_id;
+        $model->post_url = $data->post_url;
+        $model->post_data = $data->message;
+        $model->post_views = $data->views;
+        $model->published_datetime = $data->date;
+        $model->infoSource->last_indexed_date_time = $data->date;
+        $model->chat_message_id = $data->id;
+        if($model->save()){
+            return $model->id;
+        }else{
+            return null;
+        }
     }
 
 

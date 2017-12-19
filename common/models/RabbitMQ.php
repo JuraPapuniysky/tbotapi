@@ -23,10 +23,15 @@ class RabbitMQ
      * @param $infoSourceId
      * @return array
      */
-    public function indexTelegramChannel($infoSourceId)
+    public function indexTelegramChannel(InfoSource $infoSource)
     {
         $taskType  = "index_telegram_channel";
-        $data = ['task_type' => $taskType, 'task_data' => ['info_source_id' => $infoSourceId]];
+        $data = ['task_type' => $taskType, 'task_data' => ['info_source' => [
+            'id' => $infoSource->id,
+            'url' => $infoSource->url,
+            'info_source_id' => $infoSource->id,
+            'access_hash' => $infoSource->access_hash,
+        ]]];
         $this->sender($data, 'tbot_notification');
         return $data;
     }
@@ -36,11 +41,51 @@ class RabbitMQ
      * @param $postId
      * @return array
      */
-    public function searchPostForMentions($postId)
+    public function searchPostForMentions(Post $post)
     {
         $taskType  = "search_post_for_mentions";
-        $data = $data = ['task_type' => $taskType, 'task_data' => ['post_id' => $postId]];
+        $data  = ['task_type' => $taskType, 'task_data' => ['post' => [
+            'id' => $post->id,
+            'info_source_id' => $post->infoSource->info_source_id,
+            'post_url' => $post->post_url,
+            'chat_message_id' => $post->chat_message_id,
+        ]]];
         $this->sender($data, 'tbot_message_analyze');
+        return $data;
+    }
+
+    /**
+     * @param $infoSource
+     * @return array
+     */
+    public function updateChannel($infoSource)
+    {
+
+        $taskType  = "update_channel";
+        $data = $data = ['task_type' => $taskType, 'task_data' => ['info_source' => [
+            'id' => $infoSource->id,
+            'url' => $infoSource->url,
+            'info_source_id' => $infoSource->id,
+            'access_hash' => $infoSource->access_hash,
+        ]]];
+        $this->sender($data, 'tbot__update_content');
+        return $data;
+    }
+
+    /**
+     * @param $post
+     * @return array
+     */
+    public function updatePost($post)
+    {
+        $taskType  = "update_post";
+        $data = $data = ['task_type' => $taskType, 'task_data' => ['message' => [
+            'id' => $post->id,
+            'info_source_id' => $post->infoSource->info_source_id,
+            'post_url' => $post->post_url,
+            'chat_message_id' => $post->chat_message_id,
+        ]]];
+        $this->sender($data, 'tbot_update_content');
         return $data;
     }
 
