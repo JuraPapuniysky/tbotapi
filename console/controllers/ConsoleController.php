@@ -22,4 +22,12 @@ class ConsoleController extends Controller
             $info_source->save();
         }
     }
+
+    public function actionTrim()
+    {
+       foreach (InfoSource::find()->all() as $infoSource){
+           $infoSource->title = trim($infoSource->title);
+           $infoSource->save();
+       }
+    }
 }

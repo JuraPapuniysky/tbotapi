@@ -49,6 +49,8 @@ class RabbitMQ
             'info_source_id' => $post->infoSource->info_source_id,
             'post_url' => $post->post_url,
             'post_data' => $post->post_data,
+            'post_views' => $post->post_views,
+            'published_datetime' => $post->published_datetime,
             'chat_message_id' => $post->chat_message_id,
         ]]];
         $this->sender($data, 'tbot_message_analyze');

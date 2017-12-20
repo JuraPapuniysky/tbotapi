@@ -85,6 +85,6 @@ class Mention extends \yii\db\ActiveRecord
         $model->post_id = $postId;
         $model->subscription_id = $subscriptionId;
         $model->is_notified = 1;
-        return $model->save;
+        return $model->save();
     }
 }

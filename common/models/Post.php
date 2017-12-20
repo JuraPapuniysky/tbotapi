@@ -101,7 +101,7 @@ class Post extends \yii\db\ActiveRecord
         foreach ($request as $data) {
             $model = new Post();
             $model->info_source_id = self::getInfoSourceId($data->to_id->channel_id);
-            $model->post_url = $data->url;
+            //$model->post_url = $data->media->webpage->url;
             $model->post_data = $data->message;
             $model->post_views = $data->views;
             $model->published_datetime = $data->date;
@@ -163,17 +163,17 @@ class Post extends \yii\db\ActiveRecord
     public static function savePost($data)
     {
         $model = new Post();
-        $model->info_source_id = $data->to_id->channel_id;
+        $model->info_source_id = $data->info_source_id;
         $model->post_url = $data->post_url;
-        $model->post_data = $data->message;
-        $model->post_views = $data->views;
-        $model->published_datetime = $data->date;
-        $model->infoSource->last_indexed_date_time = $data->date;
-        $model->chat_message_id = $data->id;
-        if($model->save()){
-            return $model->id;
+        $model->post_data = $data->post_data;
+        $model->post_views = $data->post_views;
+        $model->published_datetime = $data->published_datetime;
+        //$model->infoSource->last_indexed_date_time = time();
+        $model->chat_message_id = $data->chat_message_id;
+        if ($model->save()){
+            echo 'Saved' . $model->id."\n";
         }else{
-            return null;
+            echo 'NOT Saved' . $model->id."\n";
         }
     }
 

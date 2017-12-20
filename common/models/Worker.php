@@ -33,6 +33,7 @@ class Worker
         $callback = function($msg) {
             $this->search($msg);
             $this->updateSubscriptions();
+            //echo $msg->body.' '.$this->hello()."\n";
         };
         $this->channel->basic_consume('tbot_message_analyze', '', false, true, false, false, $callback);
 
@@ -41,14 +42,21 @@ class Worker
         }
     }
 
+    private function hello()
+    {
+        return 'Is done';
+    }
+
     private function search($msg)
     {
         $task = json_decode($msg->body);
-        if ($task->task_type == 'tbot_message_analyze'){
+        if ($task->task_type == 'search_post_for_mentions'){
             foreach ($this->subscriptions as $subscription) {
+                echo $subscription->user_keywords. "\n";
                 $searchEngine = new SearchEngine();
                 $index = $searchEngine->makeIndex($task->task_data->post->post_data);
                 $result = $searchEngine->search($searchEngine->makeIndex($subscription->user_keywords), $index);
+                echo $result."\n";
                 if ($result > 0){
                    $postId = Post::savePost($task->task_data->post);
                    Mention::createNewMention($subscription->id, $postId);
