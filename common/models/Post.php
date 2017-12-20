@@ -98,10 +98,10 @@ class Post extends \yii\db\ActiveRecord
      */
     public static function addPost($request)
     {
-        foreach ($request->messages as $data) {
+        foreach ($request as $data) {
             $model = new Post();
             $model->info_source_id = self::getInfoSourceId($data->to_id->channel_id);
-            $model->post_url = $data->post_url;
+            $model->post_url = $data->url;
             $model->post_data = $data->message;
             $model->post_views = $data->views;
             $model->published_datetime = $data->date;

@@ -35,9 +35,9 @@ class ApiController extends ActiveController
     public function actionUpdateChannels()
     {
         $data = self::jsonDecoder();
-        if (Scrapper::isScrapper($data->id, $data->access_hash) !== false){
-            return InfoSource::updateTelegramChannel($data);
-        }
+       // if (Scrapper::isScrapper($data->id, $data->access_hash) !== false){
+            return InfoSource::updateTelegramChannels($data);
+       // }
     }
 
 
@@ -47,10 +47,8 @@ class ApiController extends ActiveController
      */
     public function actionAddPost()
     {
-        $data = self::jsonDecoder();
-        if (Scrapper::isScrapper($data->id, $data->access_hash) !== false) {
-            return Post::addPost(self::jsonDecoder());
-        }
+        return Post::addPost(self::jsonDecoder());
+        //return self::jsonDecoder()[0];
     }
 
     public function actionUpdatePosts()

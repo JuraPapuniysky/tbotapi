@@ -16,6 +16,10 @@ class ConsoleController extends Controller
 {
     public function actionIndex()
     {
-
+        foreach (file(__DIR__ . '/channels.txt') as $channel){
+            $info_source = new InfoSource();
+            $info_source->title = $channel;
+            $info_source->save();
+        }
     }
 }

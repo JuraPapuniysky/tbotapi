@@ -113,19 +113,21 @@ class InfoSource extends \yii\db\ActiveRecord
      * @param $data
      * @return null|string|NotFoundHttpException|static
      */
-    public static function updateTelegramChannel($data)
+    public static function updateTelegramChannels($channels)
     {
-        if (($model = InfoSource::findOne($data->info_source_id)) !== null) {
-            $model->title = $data->title;
-            $model->url = $data->url;
-            $model->subscribers_quantity = $data->subscribers_quantity;
-            if ($model->save()) {
-                return $model;
-            }else{
-                return "$model->id failed";
+        foreach ($channels as $channel) {
+            if (($model = InfoSource::findOne(['title' => $channels->username])) !== null) {
+                $model->title = $channel->title;
+                $model->url = $channel->username;
+                $model->info_source_id = $channel->id;
+                $model->access_hash = $channel->access_hash;
+                //$model->subscribers_quantity = $channel->subscribers_quantity;
+                if ($model->save()) {
+                    return $model;
+                } else {
+                    return "$model->id failed";
+                }
             }
-        } else {
-            return new NotFoundHttpException('info source not found');
         }
     }
 }
