@@ -45,9 +45,10 @@ class TaskController extends  Controller
         }
     }
 
-    public function actionMessagesUpdateTask()
+    public function actionUpdateMessages()
     {
-        if (($models = Post::find()->andWhere(['<', 'updated_at', time()-3600*24])) !== null){
+        //if (($models = Post::find()->andWhere(['<', 'updated_at', time()-3600*24])) !== null){
+        if (($models = Post::find()->andWhere(['<', 'updated_at', time()])->all()) !== null){
             $rabbitMQ = new RabbitMQ();
 
             $rabbitMQ->updatePost($models);

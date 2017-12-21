@@ -100,7 +100,7 @@ class RabbitMQ
             ];
             array_push($messages, $message);
         }
-        $data  = ['method' => $taskType, 'params' => ['messages' => $messages]];
+        $data  = ['request' => ['id' => null, 'jsonrpc' => '2.0', 'method' => $taskType, 'params' => ['messages' => $messages]]];
         $this->sender($data, 'tbot_update_content');
         return $data;
     }
