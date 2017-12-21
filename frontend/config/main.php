@@ -50,15 +50,18 @@ return [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['api' => 'api'],
                     'extraPatterns' => [
-                        'POST add_telegram_channels' => 'add-telegram-channels',
+                        'POST addTelegramChannels' => 'add-telegram-channels',
                         'POST updateChannels' => 'update-channels',
-                        'POST newMessage' => 'add-post',
-                        'POST update_posts_views' => 'update-posts-views',
+                        'POST newMessages' => 'add-post',
+                        'POST updatePostsViews' => 'update-posts-views',
+                        'POST updateMessages' => 'update-posts',
                         'POST test' => 'test',
                         'POST initScrapper' => 'init-scrapper',
                         'POST activateScrapper' => 'activate-scrapper',
                         'POST deactivateScrapper' => 'deactivate-scrapper',
                         'POST getAccounts' => 'get-accounts',
+                        'POST getTask' => 'get-task',
+                        'POST taskDone' => 'task-done',
 
 
                     ],

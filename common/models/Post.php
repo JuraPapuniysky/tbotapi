@@ -98,7 +98,7 @@ class Post extends \yii\db\ActiveRecord
      */
     public static function addPost($request)
     {
-        foreach ($request as $data) {
+        foreach ($request->messages as $data) {
             $model = new Post();
             $model->info_source_id = self::getInfoSourceId($data->to_id->channel_id);
             //$model->post_url = $data->media->webpage->url;
@@ -109,6 +109,7 @@ class Post extends \yii\db\ActiveRecord
             $model->chat_message_id = $data->id;
             $rabbitMQ = new RabbitMQ();
             $rabbitMQ->searchPostForMentions($model);
+            return [];
         }
     }
 
@@ -165,15 +166,15 @@ class Post extends \yii\db\ActiveRecord
         $model = new Post();
         $model->info_source_id = $data->info_source_id;
         $model->post_url = $data->post_url;
-        $model->post_data = $data->post_data;
+        $model->post_data = InfoSource::removeEmoji($data->post_data);
         $model->post_views = $data->post_views;
         $model->published_datetime = $data->published_datetime;
         //$model->infoSource->last_indexed_date_time = time();
         $model->chat_message_id = $data->chat_message_id;
         if ($model->save()){
-            echo 'Saved' . $model->id."\n";
+            return $model->id;
         }else{
-            echo 'NOT Saved' . $model->id."\n";
+            return false;
         }
     }
 

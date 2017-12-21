@@ -16,24 +16,42 @@ class TaskController extends  Controller
 
     }
 
+    public function actionSearchChannels()
+    {
+        $rabbitMQ = new RabbitMQ();
+        $rabbitMQ->searchChannels();
+    }
+
+    public function actionSearchMessages()
+    {
+        $models = InfoSource::find()->all();
+
+        foreach ($models as $model){
+            $rabbitMQ = new RabbitMQ();
+            $rabbitMQ->searchMessages($model);
+        }
+
+    }
+
     public function actionChannelsUpdateTask()
     {
         if (($models = InfoSource::find()->andWhere(['<', 'last_indexed_date_time', time()-3600*24])
                 ->andWhere([ 'last_indexed_date_time' => null])->all()) !== null){
-            $rabbitMQ = new RabbitMQ();
+
             foreach ($models as $model){
+                $rabbitMQ = new RabbitMQ();
                 $rabbitMQ->updateChannel($model);
             }
         }
     }
 
-    public function actionMessageUpdateTask()
+    public function actionMessagesUpdateTask()
     {
         if (($models = Post::find()->andWhere(['<', 'updated_at', time()-3600*24])) !== null){
             $rabbitMQ = new RabbitMQ();
-            foreach ($models as $model){
-                $rabbitMQ->updatePost($model);
-            }
+
+            $rabbitMQ->updatePost($models);
+
         }
     }
 }

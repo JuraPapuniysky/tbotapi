@@ -83,16 +83,14 @@ class InfoSource extends \yii\db\ActiveRecord
      * @param $data
      * @return array
      */
-    public static function addTelegramChannel($data)
+    public static function addTelegramChannel($channels)
     {
-        $urls = explode(',', str_replace(' ', '', $data->urls));
         $models = [];
-        $radits = [];
-        foreach ($urls as $url){
-            if (($model = InfoSource::findOne(['url' => $url])) === null){
+        foreach ($channels as $channel){
+            if (($model = InfoSource::findOne(['url' => $channel])) === null){
                 $model = new InfoSource();
-                $model->title = $url;
-                $model->url = $url;
+                $model->title = $channel;
+                $model->url = $channel;
                 $model->subscribers_quantity = 0;
 
                 $model->indexing_priority = 1;
@@ -100,13 +98,11 @@ class InfoSource extends \yii\db\ActiveRecord
                 if ($model->save()){
                     array_push($models, $model);
                     $rabbitMQ = new RabbitMQ();
-                    $rabbitMQ->indexTelegramChannel($model);
-                }else{
-                    array_push($models ,$model->save());
+                    $rabbitMQ->searchMessages($model);
                 }
             }
         }
-        return $models;
+        return [];
     }
 
     /**
@@ -127,6 +123,7 @@ class InfoSource extends \yii\db\ActiveRecord
 
             }
         }
+        return [];
     }
 
     public static function removeEmoji($text){

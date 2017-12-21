@@ -58,8 +58,11 @@ class Worker
                 $result = $searchEngine->search($searchEngine->makeIndex($subscription->user_keywords), $index);
                 echo $result."\n";
                 if ($result > 0){
-                   $postId = Post::savePost($task->task_data->post);
-                   Mention::createNewMention($subscription->id, $postId);
+                    $postId = Post::savePost($task->task_data->post);
+                   if ($postId != false){
+                       Mention::createNewMention($subscription->id, $postId);
+                   }
+
                 }
             }
         }
