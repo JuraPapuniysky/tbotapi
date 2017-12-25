@@ -35,11 +35,11 @@ class ApiController extends ActiveController
     public function actionUpdateChannels()
     {
         $data = self::jsonDecoder();
-       // if (Scrapper::isScrapper($data->id, $data->access_hash) !== false){
+        if (Scrapper::isScrapper($data->id, $data->access_hash) !== false){
            return InfoSource::updateTelegramChannels($data->channels);
-       // }
+        }
 
-        //return InfoSource::findOne(['title' => $data[0]->username]);
+        return InfoSource::findOne(['title' => $data[0]->username]);
     }
 
 
