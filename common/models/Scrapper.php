@@ -95,14 +95,14 @@ class Scrapper extends \yii\db\ActiveRecord
      * @param $access_hash
      * @return bool|null|static
      */
-    public static function isScrapper($uuid4, $access_hash)
+    public static function isScrapper($uuid4, $access_hash = null)
     {
         if (($model = Scrapper::findOne(['uuid4' => $uuid4])) !== null){
-            if ($model->access_hash === $access_hash){
+            //if ($model->access_hash === $access_hash){
                 return $model;
-            }else{
-                return false;
-            }
+            //}else{
+            //    return false;
+           // }
         }else{
             return false;
         }

@@ -36,6 +36,16 @@ class RabbitMQ
         return $data;
     }
 
+    /**
+     * @param $mention_id
+     */
+    public function sendMention($mention_id)
+    {
+        $task_type = 'mention_found';
+        $data = ['method' => $task_type, 'mention_id' => $mention_id];
+        $this->sender($data, 'tbot_notification');
+    }
+
 
     /**
      * @param Post $post

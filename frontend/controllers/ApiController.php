@@ -35,11 +35,10 @@ class ApiController extends ActiveController
     public function actionUpdateChannels()
     {
         $data = self::jsonDecoder();
-        if (Scrapper::isScrapper($data->id, $data->access_hash) !== false){
+       // if (Scrapper::isScrapper($data->id, $data->access_hash) !== false){
            return InfoSource::updateTelegramChannels($data->channels);
-        }
-
-        return InfoSource::findOne(['title' => $data[0]->username]);
+       // }
+        //return InfoSource::findOne(['title' => $data[0]->username]);
     }
 
 
@@ -130,15 +129,27 @@ class ApiController extends ActiveController
      */
     public function actionGetAccounts()
     {
-        /*
+
         $data = self::jsonDecoder();
-        if (($scrapper = Scrapper::isScrapper($data->id, $data->access_hash)) !== false){
-            return ['id' => $data->id, 'accounts' => $scrapper->updateAccounts($data->accounts), "cleanup" => true];
-        }else{
-            return new Error(0, 'Scrapper not found');
-        }
-        */
-        return ['cleanup' => false, 'accounts' => [['phoneNumber' => '380935635959', 'isActive' => true]]];
+       // if (()) !== false){
+        $scrapper = Scrapper::isScrapper($data->id);
+            $accounts = [];
+            foreach ($scrapper->accounts as $account){
+                if($account->is_active == 1){
+                    $isActive = true;
+                }else{
+                    $isActive = false;
+                }
+
+                $saccount = ['phoneNumber' => $account->phoneNumber, 'isActive' => $isActive];
+                array_push($accounts, $saccount);
+            }
+            return ['cleanup' => false, 'accounts' => $accounts];
+        //}else{
+        //    return new Error(0, 'Scrapper not found');
+       // }
+
+        //return ['cleanup' => false, 'accounts' => [['phoneNumber' => '380935635959', 'isActive' => true]]];
     }
 
     /**

@@ -166,7 +166,7 @@ class Post extends \yii\db\ActiveRecord
         $model = new Post();
         $model->info_source_id = $data->info_source_id;
         $model->post_url = $data->post_url;
-        $model->post_data = InfoSource::removeEmoji($data->post_data);
+        $model->post_data = json_encode($data->post_data); // InfoSource::removeEmoji($data->post_data); //$data->post_data;
         $model->post_views = $data->post_views;
         $model->published_datetime = $data->published_datetime;
         //$model->infoSource->last_indexed_date_time = time();

@@ -23,7 +23,9 @@ use Yii;
  *
  * @property Mention[] $mentions
  * @property Project $project
+ * @property SearchType $searchType
  * @property User $user
+ * @property UserKeyword[] $userKeywords
  */
 class Subscription extends \yii\db\ActiveRecord
 {
@@ -43,8 +45,8 @@ class Subscription extends \yii\db\ActiveRecord
         return [
             [['user_id', 'project_id', 'search_type_id', 'is_active', 'created_at', 'updated_at'], 'integer'],
             [['user_keywords', 'search_expression', 'notification_periodicity_type', 'notification_time', 'notification_mentions_limit', 'notification_channel'], 'string', 'max' => 255],
-            [['search_type_id'], 'unique'],
             [['project_id'], 'exist', 'skipOnError' => true, 'targetClass' => Project::className(), 'targetAttribute' => ['project_id' => 'id']],
+            [['search_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => SearchType::className(), 'targetAttribute' => ['search_type_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -90,8 +92,24 @@ class Subscription extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getSearchType()
+    {
+        return $this->hasOne(SearchType::className(), ['id' => 'search_type_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserKeywords()
+    {
+        return $this->hasMany(UserKeyword::className(), ['subscription_id' => 'id']);
     }
 }
