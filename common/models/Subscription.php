@@ -11,7 +11,7 @@ use Yii;
  * @property integer $user_id
  * @property integer $project_id
  * @property integer $search_type_id
- * @property string $user_keywords
+ * @property string $name
  * @property string $search_expression
  * @property string $notification_periodicity_type
  * @property string $notification_time
@@ -44,7 +44,7 @@ class Subscription extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'project_id', 'search_type_id', 'is_active', 'created_at', 'updated_at'], 'integer'],
-            [['user_keywords', 'search_expression', 'notification_periodicity_type', 'notification_time', 'notification_mentions_limit', 'notification_channel'], 'string', 'max' => 255],
+            [['name', 'search_expression', 'notification_periodicity_type', 'notification_time', 'notification_mentions_limit', 'notification_channel'], 'string', 'max' => 255],
             [['project_id'], 'exist', 'skipOnError' => true, 'targetClass' => Project::className(), 'targetAttribute' => ['project_id' => 'id']],
             [['search_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => SearchType::className(), 'targetAttribute' => ['search_type_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -61,7 +61,7 @@ class Subscription extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'project_id' => 'Project ID',
             'search_type_id' => 'Search Type ID',
-            'user_keywords' => 'User Keywords',
+            'name' => 'Name',
             'search_expression' => 'Search Expression',
             'notification_periodicity_type' => 'Notification Periodicity Type',
             'notification_time' => 'Notification Time',
